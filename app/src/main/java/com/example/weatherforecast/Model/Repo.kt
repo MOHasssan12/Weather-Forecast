@@ -29,4 +29,8 @@ class Repo ( private val remoteSource: WeatherRemoteDataSource) {
         return remoteSource.getCurrentWeather(lat, lon)
     }
 
+    fun getWeatherForecast(lat: Double, lon: Double): Flow<APIState> {
+        return remoteSource.getWeatherForecast(lat, lon)
+    }
+
 }

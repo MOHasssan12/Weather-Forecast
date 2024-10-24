@@ -9,14 +9,29 @@ import kotlinx.coroutines.launch
 
 class WeatherViewModel(private val repo: Repo) : ViewModel() {
 
+
     private val _weatherState = MutableStateFlow<APIState>(APIState.Loading)
     val weatherState: MutableStateFlow<APIState> = _weatherState
+
+    private val _forecastState = MutableStateFlow<APIState>(APIState.Loading)
+    val forecastState: MutableStateFlow<APIState> = _forecastState
 
 
     fun getWeather(lat: Double, lon: Double) {
         viewModelScope.launch {
             repo.getWeather(lat, lon).collect { state ->
                 _weatherState.value = state
+            }
+        }
+    }
+
+    fun getWeatherForecast(lat: Double, lon: Double) {
+        viewModelScope.launch {
+
+            repo.getWeatherForecast(lat, lon).collect { state ->
+                _forecastState.value = state
+
+
             }
         }
     }

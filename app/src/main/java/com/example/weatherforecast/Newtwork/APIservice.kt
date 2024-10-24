@@ -1,5 +1,6 @@
 package com.example.mvvmproducts.Network
 
+import com.example.weatherforecast.Model.ForecastInfo
 import com.example.weatherforecast.Model.WeatherInfo
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -15,6 +16,14 @@ interface APIservice {
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String
     ): WeatherInfo
+
+    @GET("forecast")
+    suspend fun getWeatherForecast(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String
+    ): ForecastInfo
+
 }
 
 object RetrofitHelper{

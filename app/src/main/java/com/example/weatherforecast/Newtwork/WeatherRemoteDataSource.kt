@@ -16,6 +16,16 @@ class WeatherRemoteDataSource(private val apiService: APIservice) {
             emit(APIState.Failure(e))
         }
     }
+
+    fun getWeatherForecast(lat: Double, lon: Double): Flow<APIState> = flow {
+        emit(APIState.Loading)
+        try {
+            val response = apiService.getWeatherForecast(lat, lon, apiKey)
+            emit(APIState.SuccessForecast(response))
+        } catch (e: Exception) {
+            emit(APIState.Failure(e))
+        }
+    }
     }
 
 

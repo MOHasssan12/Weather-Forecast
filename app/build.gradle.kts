@@ -85,4 +85,9 @@ dependencies {
 
     // Testing Navigation
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
+
+    //maps
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+   // implementation (libs.osmdroid.android)
+
 }
