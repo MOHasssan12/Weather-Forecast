@@ -14,7 +14,11 @@
         android:id="@+id/favirotes"
         android:name="com.example.weatherforecast.Favirotes.Favirotes"
         android:label="fragment_favirotes"
-        tools:layout="@layout/fragment_favirotes" />
+        tools:layout="@layout/fragment_favirotes" >
+        <action
+            android:id="@+id/action_favirotes_to_mapsFragment"
+            app:destination="@id/mapsFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/alerts"
         android:name="com.example.weatherforecast.Alerts.Alerts"
@@ -25,4 +29,9 @@
         android:name="com.example.weatherforecast.Settings.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/mapsFragment2"
+        android:name="com.example.weatherforecast.Favirotes.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
 </navigation>

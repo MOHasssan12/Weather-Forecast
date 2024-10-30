@@ -1,5 +1,6 @@
 package com.example.weatherforecast.Home.View
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,14 @@ import kotlin.math.roundToInt
 class NextFiveDaysAdapter() :
     ListAdapter<WeatherData, NextFiveDaysAdapter.ViewHolder>(WeatherDiffUtil()) {
 
+    private var temperatureUnit: String = "Kelvin"
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setTemperatureUnit(unit: String) {
+        temperatureUnit = unit
+        notifyDataSetChanged() // Notify adapter to refresh the displayed data
+    }
+
 
     class ViewHolder(private val item: View) : RecyclerView.ViewHolder(item) {
         val txtNextHourlyTemp: TextView = item.findViewById(R.id.txtNextHourlyTemp)
@@ -38,27 +47,27 @@ class NextFiveDaysAdapter() :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentHourlyWeather = getItem(position)
 
-        // Convert Unix timestamp to a human-readable date and time format
         val unixTimestamp = currentHourlyWeather.dt
-        val date = Date(unixTimestamp * 1000L) // Convert seconds to milliseconds
+        val date = Date(unixTimestamp * 1000L)
 
-        // Format to display day of the week, day of the month, and abbreviated month
-        val sdfDate = SimpleDateFormat("d MMM", Locale.getDefault()) // Format like "23 Oct"
-        val sdfDay = SimpleDateFormat("EEEE", Locale.getDefault()) // Format like "Monday"
+        val sdfDate = SimpleDateFormat("d MMM", Locale.getDefault())
+        val sdfDay = SimpleDateFormat("EEEE", Locale.getDefault())
         sdfDate.timeZone = TimeZone.getDefault()
         sdfDay.timeZone = TimeZone.getDefault()
 
         val formattedDate = sdfDate.format(date)
         val formattedDay = sdfDay.format(date)
-
-        // Set the formatted date, day, description, and temperature to the views
         holder.txtNextDateDetails.text = formattedDate
         holder.txtNextDay.text = formattedDay
         holder.txtNextHourlydesc.text = currentHourlyWeather.weather[0].description
-        val tempCelsius = (currentHourlyWeather.main.temp - 273.15).roundToInt()
-        holder.txtNextHourlyTemp.text = "$tempCelsius°C"
+        val temp = when (temperatureUnit) {
+            "Celsius" -> (currentHourlyWeather.main.temp - 273.15).roundToInt()
+            "Kelvin" -> currentHourlyWeather.main.temp.roundToInt()
+            else -> currentHourlyWeather.main.temp.roundToInt()
+        }
+        holder.txtNextHourlyTemp.text = "$temp °${if (temperatureUnit == "Celsius") "C" else "K"}"
 
-        // Load weather icon using Glide
+
         Glide.with(holder.nextImage.context)
             .load("https://openweathermap.org/img/wn/${currentHourlyWeather.weather[0].icon}@2x.png")
             .placeholder(R.drawable.ic_launcher_background)

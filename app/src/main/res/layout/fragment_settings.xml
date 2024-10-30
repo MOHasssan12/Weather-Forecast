@@ -1,14 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
     tools:context=".Settings.Settings">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Language Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/languages_card_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Settings" />
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:layout_marginTop="40dp"
+        app:cardCornerRadius="10dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-</FrameLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/material_dynamic_neutral95"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/text_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="10dp"
+                android:text="Language"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/text_english"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/text_english"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="English"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/text_language" />
+
+            <RadioButton
+                android:id="@+id/radio_english"
+                android:layout_width="37dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/text_english"
+                app:layout_constraintTop_toTopOf="@+id/text_english" />
+
+            <TextView
+                android:id="@+id/text_arabic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Arabic"
+                app:layout_constraintStart_toEndOf="@+id/radio_english"
+                app:layout_constraintTop_toTopOf="@+id/text_english" />
+
+            <RadioButton
+                android:id="@+id/radio_arabic"
+                android:layout_width="39dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintStart_toEndOf="@+id/text_arabic"
+                app:layout_constraintTop_toTopOf="@+id/radio_english" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Temperature Unit Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/temperature_unit_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        app:cardCornerRadius="10dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/languages_card_view">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/material_dynamic_neutral95"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/text_temperature_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:text="Temperature"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_kelvin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="29dp"
+                android:text="Kelvin"
+                app:layout_constraintStart_toStartOf="@+id/text_temperature_unit"
+                app:layout_constraintTop_toBottomOf="@+id/text_temperature_unit" />
+
+            <RadioButton
+                android:id="@+id/radio_kelvin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toEndOf="@+id/text_kelvin"
+                app:layout_constraintTop_toBottomOf="@+id/text_temperature_unit" />
+
+            <TextView
+                android:id="@+id/text_celsius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Celsius"
+                app:layout_constraintStart_toEndOf="@+id/radio_kelvin"
+                app:layout_constraintTop_toTopOf="@+id/text_kelvin" />
+
+            <RadioButton
+                android:id="@+id/radio_celsius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                app:layout_constraintStart_toEndOf="@+id/text_celsius"
+                app:layout_constraintTop_toTopOf="@+id/radio_kelvin" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/wind_speed_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        app:cardCornerRadius="10dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/temperature_unit_card_view">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/material_dynamic_neutral95"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/text_wind_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:text="Wind Speed  "
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_kmh"
+                android:layout_width="51dp"
+                android:layout_height="21dp"
+                android:layout_marginTop="14dp"
+                android:text="km/h"
+                app:layout_constraintStart_toStartOf="@+id/text_wind_speed"
+                app:layout_constraintTop_toBottomOf="@+id/text_wind_speed" />
+
+            <RadioButton
+                android:id="@+id/radio_kmh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="3dp"
+                app:layout_constraintStart_toEndOf="@+id/text_kmh"
+                app:layout_constraintTop_toBottomOf="@+id/text_wind_speed" />
+
+            <TextView
+                android:id="@+id/text_mph"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="mile/h"
+                app:layout_constraintStart_toEndOf="@+id/radio_kmh"
+                app:layout_constraintTop_toTopOf="@+id/text_kmh" />
+
+            <RadioButton
+                android:id="@+id/radio_mph"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintStart_toEndOf="@+id/text_mph"
+                app:layout_constraintTop_toTopOf="@+id/radio_kmh" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Location Source Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/location_source_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        app:cardCornerRadius="10dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wind_speed_card_view">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/material_dynamic_neutral95"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/text_location_source"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:text="Location Source"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="GPS"
+                app:layout_constraintStart_toStartOf="@+id/text_location_source"
+                app:layout_constraintTop_toBottomOf="@+id/text_location_source" />
+
+            <RadioButton
+                android:id="@+id/radio_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="5dp"
+                app:layout_constraintStart_toEndOf="@+id/text_gps"
+                app:layout_constraintTop_toBottomOf="@+id/text_location_source" />
+
+            <TextView
+                android:id="@+id/text_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Map"
+                app:layout_constraintStart_toEndOf="@+id/radio_gps"
+                app:layout_constraintTop_toTopOf="@+id/text_gps" />
+
+            <RadioButton
+                android:id="@+id/radio_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/text_map" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <!-- Additional cards follow the same structure as above for Wind Speed and Location Source -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

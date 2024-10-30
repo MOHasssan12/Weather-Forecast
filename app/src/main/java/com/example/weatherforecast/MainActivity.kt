@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     val REQUEST_LOCATION_CODE = 5005
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private var locationFetched = false  // Flag to check if location is already fetched
+    private var locationFetched = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getFreshLocation() {
-        if (locationFetched) return // Exit if location is already fetched
+        if (locationFetched) return
 
         if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                         val longitude = location?.longitude
                         Log.i(TAG, "Latitude: $latitude, Longitude: $longitude")
 
-                        if (!locationFetched) { // Ensure we only handle the first result
+                        if (!locationFetched) {
                             locationFetched = true
                             if (latitude != null) {
                                 if (longitude != null) {
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         val bundle = Bundle().apply {
             putDouble("latitude", latitude)
             putDouble("longitude", longitude)
-            putString("city_name", cityName) // Pass city name to the fragment
+            putString("city_name", cityName)
         }
         navController.navigate(R.id.home2, bundle)
     }

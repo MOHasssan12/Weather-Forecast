@@ -1,5 +1,6 @@
 package com.example.weatherforecast.Home.View
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,13 @@ import kotlin.math.roundToInt
 class WeatherAdapter() :
     ListAdapter<WeatherData, WeatherAdapter.ViewHolder>(WeatherDiffUtil()) {
 
+    private var temperatureUnit: String = "Kelvin"
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setTemperatureUnit(unit: String) {
+        temperatureUnit = unit
+        notifyDataSetChanged() // Notify adapter to refresh the displayed data
+    }
 
     class ViewHolder(private val item: View) : RecyclerView.ViewHolder(item) {
         val txtTime1: TextView = item.findViewById(R.id.txtTime1)
@@ -35,23 +43,25 @@ class WeatherAdapter() :
         return ViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentHourlyWeather = getItem(position)
 
-        // Convert Unix timestamp to a human-readable date and time format
         val unixTimestamp = currentHourlyWeather.dt
-        val date = Date(unixTimestamp * 1000L) // Convert seconds to milliseconds
+        val date = Date(unixTimestamp * 1000L)
 
-        // Format to display day of the week, day of the month, and abbreviated month
         val sdf = SimpleDateFormat("E d MMM HH:mm", Locale.getDefault())
-        sdf.timeZone = TimeZone.getDefault() // Set timezone to device's default
+        sdf.timeZone = TimeZone.getDefault()
         val formattedDateTime = sdf.format(date)
 
-        // Set the time, description, and temperature to the views
         holder.txtTime1.text = formattedDateTime
         holder.desc.text = currentHourlyWeather.weather[0].description
-        val tempCelsius = (currentHourlyWeather.main.temp - 273.15).roundToInt()
-        holder.temp.text = "$tempCelsius°C"
+        val temp = when (temperatureUnit) {
+            "Celsius" -> (currentHourlyWeather.main.temp - 273.15).roundToInt()
+            "Kelvin" -> currentHourlyWeather.main.temp.roundToInt()
+            else -> currentHourlyWeather.main.temp.roundToInt()
+        }
+        holder.temp.text = "$temp °${if (temperatureUnit == "Celsius") "C" else "K"}"
 
         Glide.with(holder.weatherIcon.context)
             .load("https://openweathermap.org/img/wn/${currentHourlyWeather.weather[0].icon}@2x.png")

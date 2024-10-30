@@ -1,5 +1,7 @@
 package com.example.weatherforecast.Model
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.example.mvvmproducts.Network.APIState
 import com.example.mvvmproducts.Network.WeatherRemoteDataSource
 import kotlinx.coroutines.flow.Flow
@@ -7,19 +9,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class Repo ( private val remoteSource: WeatherRemoteDataSource) {
+class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Context) {
 
-
-    private val _productsState = MutableStateFlow<APIState>(APIState.Loading)
-    val productsState: StateFlow<APIState> = _productsState.asStateFlow()
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("settings_preferences", Context.MODE_PRIVATE)
 
     companion object {
         @Volatile
         private var INSTANCE: Repo? = null
 
-        fun getInstance( remoteDataSource: WeatherRemoteDataSource): Repo? {
+        fun getInstance( remoteDataSource: WeatherRemoteDataSource ,  context: Context): Repo? {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE = Repo(remoteDataSource)
+                INSTANCE = Repo(remoteDataSource,context)
                 INSTANCE
             }
         }
@@ -31,6 +32,39 @@ class Repo ( private val remoteSource: WeatherRemoteDataSource) {
 
     fun getWeatherForecast(lat: Double, lon: Double): Flow<APIState> {
         return remoteSource.getWeatherForecast(lat, lon)
+    }
+
+    // SharedPreferences functions for settings
+    fun saveLanguage(language: String) {
+        sharedPreferences.edit().putString("language", language).apply()
+    }
+
+    fun getLanguage(): String {
+        return sharedPreferences.getString("language", "English") ?: "English"
+    }
+
+    fun saveTemperatureUnit(unit: String) {
+        sharedPreferences.edit().putString("temperature_unit", unit).apply()
+    }
+
+    fun getTemperatureUnit(): String {
+        return sharedPreferences.getString("temperature_unit", "Kelvin") ?: "Kelvin"
+    }
+
+    fun saveWindSpeedUnit(unit: String) {
+        sharedPreferences.edit().putString("wind_speed_unit", unit).apply()
+    }
+
+    fun getWindSpeedUnit(): String {
+        return sharedPreferences.getString("wind_speed_unit", "km/h") ?: "km/h"
+    }
+
+    fun saveLocationSource(source: String) {
+        sharedPreferences.edit().putString("location_source", source).apply()
+    }
+
+    fun getLocationSource(): String {
+        return sharedPreferences.getString("location_source", "GPS") ?: "GPS"
     }
 
 }
