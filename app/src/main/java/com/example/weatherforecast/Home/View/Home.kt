@@ -62,6 +62,7 @@ class Home : Fragment() {
     }
     private var temperatureUnit: String = "Kelvin"
     private var windSpeedUnit: String = "km/h"
+    private var locationSource: String = "Gps"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,26 +81,10 @@ class Home : Fragment() {
 //        ).get(SettingsViewModel::class.java)
 
         // Observe temperature and wind speed units
-        observeSettingsChanges()
     }
 
-    private fun observeSettingsChanges() {
-        lifecycleScope.launchWhenStarted {
-            // Observe temperature unit changes
-            settingsViewModel.temperatureUnit.collect { unit ->
-                temperatureUnit = unit
-                updateUIWithNewUnits()
-            }
-        }
 
-        lifecycleScope.launchWhenStarted {
-            // Observe wind speed unit changes
-            settingsViewModel.windSpeedUnit.collect { unit ->
-                windSpeedUnit = unit
-                updateUIWithNewUnits()
-            }
-        }
-    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -122,6 +107,12 @@ class Home : Fragment() {
         txtCurrentWeatherCity = view.findViewById(R.id.txtCurrentWeatherCity)
         txtPressure = view.findViewById(R.id.txtPressure)
         val cityName = arguments?.getString("city_name")
+
+        observeSettingsChanges()
+
+        getWeatherData()
+
+
 
         mAdapterForecast = NextFiveDaysAdapter()
         mLayoutManagerForecast = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -176,16 +167,89 @@ class Home : Fragment() {
             }
         }
 
-        val latitude = arguments?.getDouble("latitude")
-        val longitude = arguments?.getDouble("longitude")
+//        if(locationSource == "Gps"){
+//
+//            val latitude = arguments?.getDouble("latitude")
+//            val longitude = arguments?.getDouble("longitude")
+//
+//            Log.d("HomeFragment", "Latitude: $latitude, Longitude: $longitude, City: $cityName")
+//
+//            if (latitude != null && longitude != null) {
+//                viewModel.getWeather(latitude, longitude)
+//                viewModel.getWeatherForecast(latitude, longitude)
+//            }
+//        }
+//        else{
+//
+//            val latitude = viewModel.getLat()
+//            val longitude = viewModel.getLong()
+//
+//            Log.d("HomeFragment", "Latitude: $latitude, Longitude: $longitude, City: $cityName")
+//
+//            if (latitude != null && longitude != null) {
+//                viewModel.getWeather(latitude, longitude)
+//                viewModel.getWeatherForecast(latitude, longitude)
+//            }
+//
+//        }
 
-        Log.d("HomeFragment", "Latitude: $latitude, Longitude: $longitude, City: $cityName")
+    }
 
-        if (latitude != null && longitude != null) {
+    private fun observeSettingsChanges() {
+        lifecycleScope.launchWhenStarted {
+            // Observe temperature unit changes
+            settingsViewModel.temperatureUnit.collect { unit ->
+                temperatureUnit = unit
+                updateUIWithNewUnits()
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            // Observe wind speed unit changes
+            settingsViewModel.windSpeedUnit.collect { unit ->
+                windSpeedUnit = unit
+                updateUIWithNewUnits()
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            settingsViewModel.location.collect { source ->
+                locationSource = source
+                Log.d("HomeFragment", "Location source updated: $locationSource")
+                getWeatherData()
+            }
+        }
+
+    }
+
+    private fun getWeatherData() {
+        Log.d("HomeFragment", "Current location source: $locationSource")
+        val latitude: Double
+        val longitude: Double
+
+        // Check for location source properly
+        if (locationSource.equals("Gps", ignoreCase = true)) {
+            // Retrieve GPS coordinates from arguments
+            latitude = arguments?.getDouble("latitude") ?: 0.0
+            longitude = arguments?.getDouble("longitude") ?: 0.0
+            Log.d("HomeFragment", "Using GPS: Latitude: $latitude, Longitude: $longitude")
+        } else {
+            // Retrieve stored coordinates from SharedPreferences
+            latitude = viewModel.getLat()
+            longitude = viewModel.getLong()
+            Log.d("HomeFragment", "Using SharedPreferences: Latitude: $latitude, Longitude: $longitude")
+        }
+
+        if (latitude != 0.0 && longitude != 0.0) {
             viewModel.getWeather(latitude, longitude)
             viewModel.getWeatherForecast(latitude, longitude)
+        } else {
+            Toast.makeText(requireContext(), "Location not available", Toast.LENGTH_SHORT).show()
         }
     }
+
+
+
 
     private fun updateWeatherInfo(weatherInfo: WeatherInfo) {
         val city = weatherInfo.name

@@ -63,6 +63,22 @@ class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Contex
         sharedPreferences.edit().putString("location_source", source).apply()
     }
 
+    fun savelat(lat: Double) {
+        sharedPreferences.edit().putString("lat", lat.toString()).apply()
+    }
+    fun saveLong(long:Double) {
+        sharedPreferences.edit().putString("long", long.toString()).apply()
+    }
+
+    fun getlat(): Double {
+        return sharedPreferences.getString("lat", "0.0")?.toDouble() ?: 0.0
+    }
+
+    fun getLong(): Double {
+        return sharedPreferences.getString("long", "0.0")?.toDouble() ?: 0.0
+    }
+
+
     fun getLocationSource(): String {
         return sharedPreferences.getString("location_source", "GPS") ?: "GPS"
     }

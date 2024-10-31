@@ -25,6 +25,16 @@ class WeatherViewModel(private val repo: Repo) : ViewModel() {
         }
     }
 
+    fun getLat(): Double {
+        return repo.getlat()
+    }
+
+    fun getLong(): Double {
+        return repo.getLong()
+    }
+
+
+
     fun getWeatherForecast(lat: Double, lon: Double) {
         viewModelScope.launch {
 

@@ -28,10 +28,19 @@
         android:id="@+id/settings"
         android:name="com.example.weatherforecast.Settings.Settings"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settings_to_settingsMapFragment"
+            app:destination="@id/settingsMapFragment" />
+    </fragment>
     <fragment
         android:id="@+id/mapsFragment2"
         android:name="com.example.weatherforecast.Favirotes.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
+    <fragment
+        android:id="@+id/settingsMapFragment"
+        android:name="com.example.weatherforecast.Settings.SettingsMapFragment"
+        android:label="fragment_settings_map"
+        tools:layout="@layout/fragment_settings_map" />
 </navigation>
