@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -65,6 +66,8 @@ class Home : Fragment() {
     lateinit var txtCloud : TextView
     lateinit var txtCurrentWeatherTime : TextView
     lateinit var txtCurrentWeatherSunsetRise : TextView
+    lateinit var progressBar: ProgressBar
+
 
 
     private var temperatureUnit: String = "Kelvin"
@@ -88,14 +91,7 @@ class Home : Fragment() {
         })
         viewModel = ViewModelProvider(requireActivity(), weatherViewModelFactory).get(WeatherViewModel::class.java)
 
-//        // Set up ViewModel with Repository
-//        val repo = Repo.getInstance(remoteSource, requireContext().applicationContext)
-//        settingsViewModel = ViewModelProvider(
-//            this,
-//            SettingsViewModelFactory(repo)
-//        ).get(SettingsViewModel::class.java)
 
-        // Observe temperature and wind speed units
     }
 
 
@@ -129,6 +125,8 @@ class Home : Fragment() {
         txtCurrentWeatherTime = view.findViewById(R.id.txtCurrentWeatherTime)
         txtCurrentWeatherSunsetRise = view.findViewById(R.id.txtCurrentWeatherSunsetRise)
         txtCloud = view.findViewById(R.id.txtCloud)
+        progressBar = view.findViewById(R.id.progressBar)
+
 
         val cityName = arguments?.getString("city_name")
 
@@ -152,18 +150,19 @@ class Home : Fragment() {
             layoutManager = mLayoutManager
         }
 
-        // Collect weather state
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.weatherState.collect { state ->
                 when (state) {
                     is APIState.Loading -> {
-                        Toast.makeText(requireContext(), "Loading...", Toast.LENGTH_SHORT).show()
+                        progressBar.visibility = View.VISIBLE
                     }
                     is APIState.Success -> {
+                        progressBar.visibility = View.GONE
                         val weatherInfo = state.data
                         updateWeatherInfo(weatherInfo)
                     }
                     is APIState.Failure -> {
+                        progressBar.visibility = View.GONE
                         Toast.makeText(requireContext(), "Error: ${state.msg.message}", Toast.LENGTH_LONG).show()
                     }
                     else -> {}
@@ -171,57 +170,34 @@ class Home : Fragment() {
             }
         }
 
-        // Collect forecast state
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.forecastState.collect { state ->
                 when (state) {
                     is APIState.SuccessForecast -> {
+                        progressBar.visibility = View.GONE
                         val forecastInfo = state.data
                         mAdapter.submitList(filterCurrentDayData(forecastInfo.list))
                         mAdapterForecast.submitList(getNextDaysForecast(forecastInfo.list))
                     }
                     is APIState.Failure -> {
+                        progressBar.visibility = View.GONE
                         Log.e("WeatherForecast", "Error fetching forecast: ${state.msg.message}")
                     }
                     APIState.Loading -> {
-                        Toast.makeText(requireContext(), "Loading...", Toast.LENGTH_SHORT).show()
+                        progressBar.visibility = View.VISIBLE
+
                     }
                     else -> {}
                 }
             }
         }
 
-//        if(locationSource == "Gps"){
-//
-//            val latitude = arguments?.getDouble("latitude")
-//            val longitude = arguments?.getDouble("longitude")
-//
-//            Log.d("HomeFragment", "Latitude: $latitude, Longitude: $longitude, City: $cityName")
-//
-//            if (latitude != null && longitude != null) {
-//                viewModel.getWeather(latitude, longitude)
-//                viewModel.getWeatherForecast(latitude, longitude)
-//            }
-//        }
-//        else{
-//
-//            val latitude = viewModel.getLat()
-//            val longitude = viewModel.getLong()
-//
-//            Log.d("HomeFragment", "Latitude: $latitude, Longitude: $longitude, City: $cityName")
-//
-//            if (latitude != null && longitude != null) {
-//                viewModel.getWeather(latitude, longitude)
-//                viewModel.getWeatherForecast(latitude, longitude)
-//            }
-//
-//        }
+
 
     }
 
     private fun observeSettingsChanges() {
         lifecycleScope.launchWhenStarted {
-            // Observe temperature unit changes
             settingsViewModel.temperatureUnit.collect { unit ->
                 temperatureUnit = unit
                 updateUIWithNewUnits()
@@ -229,7 +205,6 @@ class Home : Fragment() {
         }
 
         lifecycleScope.launchWhenStarted {
-            // Observe wind speed unit changes
             settingsViewModel.windSpeedUnit.collect { unit ->
                 windSpeedUnit = unit
                 updateUIWithNewUnits()
@@ -251,14 +226,12 @@ class Home : Fragment() {
         val latitude: Double
         val longitude: Double
 
-        // Check for location source properly
         if (locationSource.equals("Gps", ignoreCase = true)) {
             // Retrieve GPS coordinates from arguments
             latitude = arguments?.getDouble("latitude") ?: 0.0
             longitude = arguments?.getDouble("longitude") ?: 0.0
             Log.d("HomeFragment", "Using GPS: Latitude: $latitude, Longitude: $longitude")
         } else {
-            // Retrieve stored coordinates from SharedPreferences
             latitude = viewModel.getLat()
             longitude = viewModel.getLong()
             Log.d("HomeFragment", "Using SharedPreferences: Latitude: $latitude, Longitude: $longitude")
@@ -325,13 +298,11 @@ class Home : Fragment() {
     }
 
     private fun updateUIWithNewUnits() {
-        // The temperature unit changes can be observed using the existing state without collecting again
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.weatherState.collectLatest { state ->
                 if (state is APIState.Success) {
                     updateTemperatureAndWindSpeed(state.data)
 
-                    // Update the forecast UI if needed
                     val forecastInfo = viewModel.forecastState.value
                     if (forecastInfo is APIState.SuccessForecast) {
                         mAdapterForecast.submitList(getNextDaysForecast(forecastInfo.data.list))
@@ -376,6 +347,6 @@ class Home : Fragment() {
         } else {
             ContextCompat.getDrawable(requireContext(), R.drawable.night_bg)
         }
-        view?.background = backgroundDrawable // Use `background` instead of `setBackgroundDrawable`
+        view?.background = backgroundDrawable
     }
 }

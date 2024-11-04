@@ -49,7 +49,6 @@ class Alerts : Fragment() {
         val alertDao = WeatherDataBase.getInstance(requireContext()).getAlertDAO()
 
         val localDataSource = LocalDataSource(weatherdao,alertDao)
-        // Pass this data to the alert fragment or ViewModel as needed
         val  viewModelFactory = AlertsViewModelFactory(context?.let {
             Repo.getInstance(remoteSource, it , localDataSource)
         },requireContext())
@@ -93,7 +92,6 @@ class Alerts : Fragment() {
             }
         }
 
-        // Set up ItemTouchHelper for swipe-to-delete functionality
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -108,12 +106,10 @@ class Alerts : Fragment() {
                 val deletedWeather = adapter.getWeatherAtPosition(position)
 
                 if (deletedWeather != null) {
-                    // Remove item from adapter and notify ViewModel to delete from database
                     adapter.removeItemAtPosition(position)
 
                     alertsViewModel.deleteAlert(deletedWeather)
 
-                    // Show Snackbar for undo option
                     Snackbar.make(recyclerView, "Item deleted", Snackbar.LENGTH_LONG)
                         .setAction("UNDO") {
                             adapter.addItemAtPosition(deletedWeather, position)
@@ -146,15 +142,13 @@ class Alerts : Fragment() {
             putExtra("message", "Weather Alert!")
         }
 
-        // Make the PendingIntent unique by using the current time
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            timeInMillis.toInt(), // Use time in milliseconds as a unique request code
+            timeInMillis.toInt(),
             intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT // Update existing if it exists
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        // Set the alarm
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
         } else {

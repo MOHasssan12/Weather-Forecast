@@ -94,7 +94,6 @@ class AlertDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Check the flag and navigate if necessary
         if (shouldNavigateToMap) {
             findNavController().navigate(R.id.action_alertDialogFragment_to_alertMapsFragment)
         }

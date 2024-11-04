@@ -73,6 +73,8 @@
                     app:layout_constraintStart_toStartOf="parent">
 
 
+
+
                     <TextView
                         android:id="@+id/txtCurrentWeatherDate"
                         android:layout_width="wrap_content"
@@ -299,6 +301,22 @@
                         app:layout_constraintStart_toEndOf="@+id/textView5"
                         app:layout_constraintTop_toTopOf="@+id/textView5" />
 
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="13dp"
+                        android:layout_marginTop="70dp"
+                        android:layout_marginEnd="29dp"
+                        android:layout_marginBottom="31dp"
+                        android:progressTint="#000000"
+                        android:visibility="visible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/textView7"
+                        app:layout_constraintStart_toEndOf="@+id/textView5"
+                        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -352,6 +370,8 @@
                 android:scrollbars="none"
                 app:layout_constraintStart_toStartOf="@id/txtCurrentWeatherCity"
                 app:layout_constraintTop_toBottomOf="@id/txt_Next_Five_days" />
+
+
 
         </LinearLayout>
     </ScrollView>

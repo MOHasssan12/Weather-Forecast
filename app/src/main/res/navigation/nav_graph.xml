@@ -57,4 +57,9 @@
         android:name="com.example.weatherforecast.Alerts.AlertMapsFragment"
         android:label="fragment_alert_maps"
         tools:layout="@layout/fragment_alert_maps" />
+    <fragment
+        android:id="@+id/noNetwork"
+        android:name="com.example.NoNetwork"
+        android:label="fragment_no_network"
+        tools:layout="@layout/fragment_no_network" />
 </navigation>

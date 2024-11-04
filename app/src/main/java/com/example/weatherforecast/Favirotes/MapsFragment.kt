@@ -43,10 +43,8 @@ class MapsFragment : Fragment() {
         txtCity = view.findViewById(R.id.txtCity)
         btnSelect = view.findViewById(R.id.btnSelect)
 
-        // Enable multi-touch controls for zooming
         mapView.setMultiTouchControls(true)
 
-        // Set initial map center to the Middle East region
         val middleEastGeoPoint = GeoPoint(25.0, 45.0)  // Roughly Middle East
         mapView.controller.setZoom(5.0)  // Adjust zoom level as needed
         mapView.controller.setCenter(middleEastGeoPoint)
@@ -58,7 +56,6 @@ class MapsFragment : Fragment() {
             )
         )
 
-        // Map touch listener
         mapView.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_UP -> {
@@ -73,7 +70,6 @@ class MapsFragment : Fragment() {
             }
         }
 
-        // Button click listener to return lat/lon to previous fragment
         btnSelect.setOnClickListener {
             val geoPoint = mapView.overlays
                 .filterIsInstance<Marker>()

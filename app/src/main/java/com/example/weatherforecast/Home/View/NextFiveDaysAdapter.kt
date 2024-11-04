@@ -26,7 +26,7 @@ class NextFiveDaysAdapter() :
     @SuppressLint("NotifyDataSetChanged")
     fun setTemperatureUnit(unit: String) {
         temperatureUnit = unit
-        notifyDataSetChanged() // Notify adapter to refresh the displayed data
+        notifyDataSetChanged()
     }
 
 

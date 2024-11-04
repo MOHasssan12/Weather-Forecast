@@ -1,0 +1,34 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_no_network"
+    android:layout_width="match_parent"
+    android:background="@drawable/background2"
+    android:layout_height="match_parent"
+    tools:context="com.example.NoNetwork">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="302dp"
+        android:layout_height="385dp"
+        android:layout_marginTop="61dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/nonetwork"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="44dp"
+        android:textStyle="bold"
+        android:text="Favirotes Locations are  availabel while Network is Down "
+        android:textSize="20dp"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

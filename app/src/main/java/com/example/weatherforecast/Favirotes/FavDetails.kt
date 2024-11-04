@@ -63,7 +63,6 @@ class FavDetails : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_fav_details)
 
-        // Initialize Views
         txtCurrentWeatherDate = findViewById(R.id.txtCurrentWeatherDate2)
         txtWeatherDesc = findViewById(R.id.txtWeatherDesc2)
         txtTemperature = findViewById(R.id.txtTemperature2)
@@ -77,13 +76,11 @@ class FavDetails : AppCompatActivity() {
         txtCurrentWeatherSunsetRise = findViewById(R.id.txtCurrentWeatherSunsetRise2)
         txtCloud = findViewById(R.id.txtCloud2)
 
-        // Initialize ViewModel components and data sources
         val remoteSource = WeatherRemoteDataSource(RetrofitHelper.service)
         val weatherDAO = WeatherDataBase.getInstance(this).getWeatherDAO()
         val alertDao = WeatherDataBase.getInstance(this).getAlertDAO()
         val localeDataSource = LocalDataSource(weatherDAO, alertDao)
 
-        // Initialize SettingsViewModel
         val settingsViewModelFactory = Repo.getInstance(remoteSource, this, localeDataSource)?.let {
             SettingsViewModelFactory(
                 it
@@ -95,26 +92,21 @@ class FavDetails : AppCompatActivity() {
             ).get(SettingsViewModel::class.java)
         }!!
 
-        // Initialize WeatherViewModel
         viewModelFactory = WeatherViewModelFactory(
             Repo.getInstance(remoteSource, this, localeDataSource)
         )
         viewModel = ViewModelProvider(this, viewModelFactory).get(WeatherViewModel::class.java)
 
-        // Get latitude and longitude from Intent extras
         val latitude = intent.getDoubleExtra("latitude", 0.0)
         val longitude = intent.getDoubleExtra("longitude", 0.0)
 
-        // Call the ViewModel function to retrieve weather information
         viewModel.getWeather(latitude, longitude)
         observeSettingsChanges()
 
-        // Observe the weatherState to handle API responses
         lifecycleScope.launchWhenStarted {
             viewModel.weatherState.collect { state ->
                 when (state) {
                     is APIState.Loading -> {
-                        Toast.makeText(this@FavDetails, "Loading...", Toast.LENGTH_SHORT).show()
                     }
                     is APIState.Success -> {
                         val weatherInfo = state.data
@@ -132,7 +124,6 @@ class FavDetails : AppCompatActivity() {
             }
         }
 
-        // Handle window insets for full-screen experience
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

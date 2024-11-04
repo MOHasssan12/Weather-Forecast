@@ -3,11 +3,11 @@ package com.example.mvvmproducts.Network
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class WeatherRemoteDataSource(private val apiService: APIservice) {
+class WeatherRemoteDataSource(private val apiService: APIservice) : IWeatherRemoteDataSource {
 
     private val apiKey = "39db03c72297ad6c8b1d7f4980b9a8c6"
 
-    fun getCurrentWeather(lat : Double,  lon : Double): Flow<APIState> = flow {
+    override fun getCurrentWeather(lat : Double, lon : Double): Flow<APIState> = flow {
         emit(APIState.Loading)
         try {
             val response = apiService.getCurrentWeather(lat, lon, apiKey)
@@ -17,7 +17,7 @@ class WeatherRemoteDataSource(private val apiService: APIservice) {
         }
     }
 
-    fun getWeatherForecast(lat: Double, lon: Double): Flow<APIState> = flow {
+    override fun getWeatherForecast(lat: Double, lon: Double): Flow<APIState> = flow {
         emit(APIState.Loading)
         try {
             val response = apiService.getWeatherForecast(lat, lon, apiKey)

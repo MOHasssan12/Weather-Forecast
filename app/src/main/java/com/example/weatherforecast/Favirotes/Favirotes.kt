@@ -61,7 +61,6 @@ class Favirotes : Fragment() {
                 ?.let { SettingsViewModelFactory(it) }!!
         }.value
 
-        // Observe for location data returned from MapsFragment
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<GeoPoint>("location")
             ?.observe(this) { geoPoint ->
                 if (geoPoint != null) {
@@ -95,20 +94,17 @@ class Favirotes : Fragment() {
 
         viewModel.loadFavoriteWeather()
 
-        // Navigate to MapsFragment to select a new location
         addFavorite.setOnClickListener {
             findNavController().navigate(R.id.action_favirotes_to_mapsFragment)
         }
 
         observeSettingsChanges()
 
-        // Observe favorite weather data from ViewModel
         lifecycleScope.launchWhenStarted {
             viewModel.favoriteWeatherData.collect { favoriteWeatherList ->
                 adapter.submitList(favoriteWeatherList)
             }
         }
-        // Set up ItemTouchHelper for swipe-to-delete functionality
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -123,13 +119,11 @@ class Favirotes : Fragment() {
                 val deletedWeather = adapter.getWeatherAtPosition(position)
 
                 if (deletedWeather != null) {
-                    // Remove item from adapter and notify ViewModel to delete from database
                     adapter.removeItemAtPosition(position)
 
                     viewModel.deleteFavoriteLocation(deletedWeather)
 
 
-                    // Show Snackbar for undo option
                     Snackbar.make(recyclerView, "Item deleted", Snackbar.LENGTH_LONG)
                         .setAction("UNDO") {
                             adapter.addItemAtPosition(deletedWeather, position)
@@ -145,7 +139,6 @@ class Favirotes : Fragment() {
     }
 
     private fun addFavoriteLocation(lat: Double, lon: Double) {
-        // Fetch weather for the new favorite location and add it to the database
         lifecycleScope.launch {
             viewModel.getWeather(lat, lon)
             viewModel.favoriteLocations.collect { state ->

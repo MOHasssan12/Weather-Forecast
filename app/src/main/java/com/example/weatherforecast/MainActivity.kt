@@ -8,6 +8,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -17,6 +20,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -34,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     val REQUEST_LOCATION_CODE = 5005
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var locationFetched = false
+    private lateinit var connectivityManager: ConnectivityManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +49,15 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.btm_nav)
         val navController = Navigation.findNavController(this, R.id.host_fragment)
         bottomNavigationView.setupWithNavController(navController)
+
+
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        listenForNetworkChanges(navController)
+
+        // Initial network check
+        if (!isNetworkAvailable()) {
+            navController.navigate(R.id.noNetwork)
+        }
     }
 
     override fun onStart() {
@@ -76,6 +90,30 @@ class MainActivity : AppCompatActivity() {
     fun checkPermission(): Boolean {
         return (ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private fun listenForNetworkChanges(navController: NavController) {
+        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                runOnUiThread {
+                    if (navController.currentDestination?.id == R.id.noNetwork) {
+                        navController.popBackStack()
+                    }
+                }
+            }
+
+            override fun onLost(network: Network) {
+                runOnUiThread {
+                    navController.navigate(R.id.noNetwork)
+                }
+            }
+        })
     }
 
     fun getFreshLocation() {

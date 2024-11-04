@@ -149,7 +149,6 @@ class AlertMapsFragment : Fragment() {
     private fun showDateTimePicker() {
         val calendar = Calendar.getInstance()
 
-        // Show DatePicker
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, month, dayOfMonth ->

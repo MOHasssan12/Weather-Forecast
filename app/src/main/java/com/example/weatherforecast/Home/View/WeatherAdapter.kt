@@ -27,7 +27,7 @@ class WeatherAdapter() :
     @SuppressLint("NotifyDataSetChanged")
     fun setTemperatureUnit(unit: String) {
         temperatureUnit = unit
-        notifyDataSetChanged() // Notify adapter to refresh the displayed data
+        notifyDataSetChanged()
     }
 
     class ViewHolder(private val item: View) : RecyclerView.ViewHolder(item) {
