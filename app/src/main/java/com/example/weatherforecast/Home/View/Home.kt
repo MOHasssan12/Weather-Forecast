@@ -21,6 +21,9 @@ import com.bumptech.glide.Glide
 import com.example.mvvmproducts.Network.APIState
 import com.example.mvvmproducts.Network.RetrofitHelper
 import com.example.mvvmproducts.Network.WeatherRemoteDataSource
+import com.example.weatherforecast.DB.LocalDataSource
+import com.example.weatherforecast.DB.WeatherDAO
+import com.example.weatherforecast.DB.WeatherDataBase
 import com.example.weatherforecast.Home.ViewModel.WeatherViewModel
 import com.example.weatherforecast.Home.ViewModel.WeatherViewModelFactory
 import com.example.weatherforecast.Model.Repo
@@ -39,6 +42,8 @@ import kotlin.math.roundToInt
 
 class Home : Fragment() {
 
+
+
     lateinit var recyclerView: RecyclerView
     lateinit var mAdapter: WeatherAdapter
     lateinit var mLayoutManager: LinearLayoutManager
@@ -56,10 +61,12 @@ class Home : Fragment() {
     lateinit var weatherImage: ImageView
     lateinit var viewModel: WeatherViewModel
     lateinit var weatherViewModelFactory: WeatherViewModelFactory
-    private val settingsViewModel: SettingsViewModel by activityViewModels {
-        Repo.getInstance(WeatherRemoteDataSource(RetrofitHelper.service), requireContext())
-            ?.let { SettingsViewModelFactory(it) }!!
-    }
+    lateinit var settingsViewModel: SettingsViewModel
+    lateinit var txtCloud : TextView
+    lateinit var txtCurrentWeatherTime : TextView
+    lateinit var txtCurrentWeatherSunsetRise : TextView
+
+
     private var temperatureUnit: String = "Kelvin"
     private var windSpeedUnit: String = "km/h"
     private var locationSource: String = "Gps"
@@ -67,9 +74,17 @@ class Home : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val remoteSource = WeatherRemoteDataSource(RetrofitHelper.service)
+        val WeatherDAO = WeatherDataBase.getInstance(requireContext()).getWeatherDAO()
+        val alertDao = WeatherDataBase.getInstance(requireContext()).getAlertDAO()
+        val localeDataSource = LocalDataSource(WeatherDAO,alertDao)
+
+        settingsViewModel = activityViewModels<SettingsViewModel> {
+            Repo.getInstance(WeatherRemoteDataSource(RetrofitHelper.service), requireContext(),localeDataSource)
+                ?.let { SettingsViewModelFactory(it) }!!
+        }.value
 
         weatherViewModelFactory = WeatherViewModelFactory(context?.let {
-            Repo.getInstance(remoteSource, it)
+            Repo.getInstance(remoteSource, it , localeDataSource)
         })
         viewModel = ViewModelProvider(requireActivity(), weatherViewModelFactory).get(WeatherViewModel::class.java)
 
@@ -93,6 +108,11 @@ class Home : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
+
+
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.rec_hourly_details)
@@ -106,6 +126,10 @@ class Home : Fragment() {
         weatherImage = view.findViewById(R.id.Weather_image)
         txtCurrentWeatherCity = view.findViewById(R.id.txtCurrentWeatherCity)
         txtPressure = view.findViewById(R.id.txtPressure)
+        txtCurrentWeatherTime = view.findViewById(R.id.txtCurrentWeatherTime)
+        txtCurrentWeatherSunsetRise = view.findViewById(R.id.txtCurrentWeatherSunsetRise)
+        txtCloud = view.findViewById(R.id.txtCloud)
+
         val cityName = arguments?.getString("city_name")
 
         observeSettingsChanges()
@@ -251,6 +275,7 @@ class Home : Fragment() {
 
 
 
+    @SuppressLint("SetTextI18n")
     private fun updateWeatherInfo(weatherInfo: WeatherInfo) {
         val city = weatherInfo.name
         val country = weatherInfo.sys.country
@@ -261,11 +286,15 @@ class Home : Fragment() {
         sdfDate.timeZone = TimeZone.getDefault()
         txtCurrentWeatherCity.text = "$country, $city"
         txtCurrentWeatherDate.text = sdfDate.format(date)
+        txtCurrentWeatherTime.text = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date)
 
+        val sunriseTimestamp = weatherInfo.sys.sunrise.toLong()
+        val sunsetTimestamp = weatherInfo.sys.sunset.toLong()
+        txtCurrentWeatherSunsetRise.text = "Sunset : ${SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(sunsetTimestamp * 1000L))} - Sunrise : ${SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(sunriseTimestamp * 1000L))}"
         updateTemperatureAndWindSpeed(weatherInfo)
         txtWeatherDesc.text = weatherInfo.weather[0].description
 
-        setBackgroundAccordingToTime(unixTimestamp)
+        //setBackgroundAccordingToTime(unixTimestamp)
 
         Glide.with(weatherImage.context)
             .load("https://openweathermap.org/img/wn/${weatherInfo.weather[0].icon}@2x.png")
@@ -292,6 +321,7 @@ class Home : Fragment() {
         txtHumidaty.text = "${weatherInfo.main.humidity}%"
         txtRain.text = "${weatherInfo.rain?.`1h` ?: 0} mm"
         txtPressure.text = "${weatherInfo.main.pressure} hPa"
+        txtCloud.text = "${weatherInfo.clouds.all}%"
     }
 
     private fun updateUIWithNewUnits() {

@@ -7,6 +7,7 @@ data class ForecastInfo(
     val list: List<WeatherData>,
     val city: City
 )
+
 data class WeatherData(
     val dt: Long,
     val main: Main,

@@ -1,24 +1,33 @@
 package com.example.weatherforecast.Favirotes
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvmproducts.Network.APIState
-import com.example.weatherforecast.R
-import com.example.weatherforecast.Model.Repo
 import com.example.mvvmproducts.Network.RetrofitHelper
 import com.example.mvvmproducts.Network.WeatherRemoteDataSource
-import com.example.weatherforecast.Model.LatLong
-import com.example.weatherforecast.Model.WeatherInfo
+import com.example.weatherforecast.DB.LocalDataSource
+import com.example.weatherforecast.DB.WeatherDataBase
+import com.example.weatherforecast.Model.Repo
+import com.example.weatherforecast.R
+import com.example.weatherforecast.Settings.SettingsViewModel
+import com.example.weatherforecast.Settings.SettingsViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+
 
 class Favirotes : Fragment() {
 
@@ -27,25 +36,37 @@ class Favirotes : Fragment() {
     private lateinit var adapter: FavAdapter
     private lateinit var viewModel: FavirotesViewModel
     private lateinit var viewModelFactory: FavirotesViewModelFactory
-    private val listOfLocations: MutableList<LatLong> = mutableListOf()
+
+    private lateinit var settingsViewModel: SettingsViewModel
+
+    private var temperatureUnit: String = "Kelvin"
+    private var windSpeedUnit: String = "km/h"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val remoteSource = WeatherRemoteDataSource(RetrofitHelper.service)
-        viewModelFactory = FavirotesViewModelFactory(context?.let {
-            Repo.getInstance(remoteSource,
-                it
-            )
-        })
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            viewModelFactory
-        ).get(FavirotesViewModel::class.java)
+        val weatherdao = WeatherDataBase.getInstance(requireContext()).getWeatherDAO()
+        val alertDao = WeatherDataBase.getInstance(requireContext()).getAlertDAO()
 
+        val localDataSource = LocalDataSource(weatherdao,alertDao)
+        viewModelFactory = FavirotesViewModelFactory(context?.let {
+            Repo.getInstance(remoteSource, it , localDataSource)
+        })
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(FavirotesViewModel::class.java)
+
+
+        settingsViewModel = activityViewModels<SettingsViewModel> {
+            Repo.getInstance(WeatherRemoteDataSource(RetrofitHelper.service), requireContext(),localDataSource)
+                ?.let { SettingsViewModelFactory(it) }!!
+        }.value
+
+        // Observe for location data returned from MapsFragment
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<GeoPoint>("location")
             ?.observe(this) { geoPoint ->
-                listOfLocations.add(LatLong(geoPoint.latitude, geoPoint.longitude))
+                if (geoPoint != null) {
+                    addFavoriteLocation(geoPoint.latitude, geoPoint.longitude)
+                }
             }
     }
 
@@ -59,29 +80,98 @@ class Favirotes : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        adapter = FavAdapter { weatherInfo ->
+            val intent = Intent(requireContext(), FavDetails::class.java)
+            intent.putExtra("latitude", weatherInfo.coord.lat)
+            intent.putExtra("longitude", weatherInfo.coord.lon)
+            startActivity(intent)
+        }
+
         addFavorite = view.findViewById(R.id.FAB_Add)
         recyclerView = view.findViewById(R.id.rv_favirotes)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext() , RecyclerView.VERTICAL, false)
-        adapter = FavAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         recyclerView.adapter = adapter
 
+
+        viewModel.loadFavoriteWeather()
+
+        // Navigate to MapsFragment to select a new location
         addFavorite.setOnClickListener {
             findNavController().navigate(R.id.action_favirotes_to_mapsFragment)
         }
 
+        observeSettingsChanges()
+
+        // Observe favorite weather data from ViewModel
         lifecycleScope.launchWhenStarted {
-            val weatherDataList = mutableListOf<WeatherInfo>()
-            for (location in listOfLocations) {
-                viewModel.getWeather(location.latitude, location.longitude)
-                viewModel.favoriteLocations.collect { state ->
-                    if (state is APIState.Success) {
-                        weatherDataList.add(state.data)
-                        adapter.submitList(weatherDataList)
-                    } else if (state is APIState.Failure) {
-                    }
+            viewModel.favoriteWeatherData.collect { favoriteWeatherList ->
+                adapter.submitList(favoriteWeatherList)
+            }
+        }
+        // Set up ItemTouchHelper for swipe-to-delete functionality
+        val itemTouchHelper = ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val deletedWeather = adapter.getWeatherAtPosition(position)
+
+                if (deletedWeather != null) {
+                    // Remove item from adapter and notify ViewModel to delete from database
+                    adapter.removeItemAtPosition(position)
+
+                    viewModel.deleteFavoriteLocation(deletedWeather)
+
+
+                    // Show Snackbar for undo option
+                    Snackbar.make(recyclerView, "Item deleted", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO") {
+                            adapter.addItemAtPosition(deletedWeather, position)
+                            viewModel.addFavoriteLocation(deletedWeather)
+                        }.show()
+                }else{
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    private fun addFavoriteLocation(lat: Double, lon: Double) {
+        // Fetch weather for the new favorite location and add it to the database
+        lifecycleScope.launch {
+            viewModel.getWeather(lat, lon)
+            viewModel.favoriteLocations.collect { state ->
+                if (state is APIState.Success) {
+                    val weatherInfo = state.data
+                    viewModel.addFavoriteLocation(weatherInfo)
                 }
             }
         }
     }
+
+    private fun observeSettingsChanges() {
+        lifecycleScope.launchWhenStarted {
+            settingsViewModel.temperatureUnit.collect { unit ->
+                temperatureUnit = unit
+                adapter.setTemperatureUnit(temperatureUnit)
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            settingsViewModel.windSpeedUnit.collect { unit ->
+                windSpeedUnit = unit
+                adapter.setTemperatureUnit(temperatureUnit)
+            }
+        }
+    }
+
 
 }

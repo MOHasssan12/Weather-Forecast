@@ -33,7 +33,6 @@ class WeatherAdapter() :
     class ViewHolder(private val item: View) : RecyclerView.ViewHolder(item) {
         val txtTime1: TextView = item.findViewById(R.id.txtTime1)
         val weatherIcon: ImageView = item.findViewById(R.id.NextImage)
-        val desc: TextView = item.findViewById(R.id.txtNextHourlyDesc)
         val temp: TextView = item.findViewById(R.id.txtNextHourlyTemp)
     }
 
@@ -50,12 +49,11 @@ class WeatherAdapter() :
         val unixTimestamp = currentHourlyWeather.dt
         val date = Date(unixTimestamp * 1000L)
 
-        val sdf = SimpleDateFormat("E d MMM HH:mm", Locale.getDefault())
+        val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
         sdf.timeZone = TimeZone.getDefault()
         val formattedDateTime = sdf.format(date)
 
         holder.txtTime1.text = formattedDateTime
-        holder.desc.text = currentHourlyWeather.weather[0].description
         val temp = when (temperatureUnit) {
             "Celsius" -> (currentHourlyWeather.main.temp - 273.15).roundToInt()
             "Kelvin" -> currentHourlyWeather.main.temp.roundToInt()

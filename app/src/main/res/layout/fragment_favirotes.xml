@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background2"
     tools:context=".Favirotes.Favirotes">
 
 
@@ -21,9 +22,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favirotes"
         android:layout_width="409dp"
-        android:layout_height="634dp"
+        android:layout_height="680dp"
         android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

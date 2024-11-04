@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.mvvmproducts.Network.APIState
 import com.example.mvvmproducts.Network.WeatherRemoteDataSource
+import com.example.weatherforecast.DB.LocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Context) {
+class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Context ,    private val localDataSource: LocalDataSource,
+) {
 
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("settings_preferences", Context.MODE_PRIVATE)
@@ -18,14 +20,15 @@ class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Contex
         @Volatile
         private var INSTANCE: Repo? = null
 
-        fun getInstance( remoteDataSource: WeatherRemoteDataSource ,  context: Context): Repo? {
+        fun getInstance( remoteDataSource: WeatherRemoteDataSource ,  context: Context , localDataSource: LocalDataSource): Repo? {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE = Repo(remoteDataSource,context)
+                INSTANCE = Repo(remoteDataSource,context , localDataSource)
                 INSTANCE
             }
         }
     }
 
+    // retrofit functions
     fun getWeather(lat : Double,  lon : Double): Flow<APIState> {
         return remoteSource.getCurrentWeather(lat, lon)
     }
@@ -33,6 +36,22 @@ class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Contex
     fun getWeatherForecast(lat: Double, lon: Double): Flow<APIState> {
         return remoteSource.getWeatherForecast(lat, lon)
     }
+
+// database functions for favorites
+    fun getFavoriteWeather(): Flow<List<WeatherInfo>> = localDataSource.getFavWeather()
+
+    suspend fun saveWeather(weather: WeatherInfo) = localDataSource.insert(weather)
+
+    suspend fun deleteWeather(weather: WeatherInfo) = localDataSource.delete(weather)
+
+
+    // database function for Alerts
+    fun getAlertsWeather(): Flow<List<Alert>> = localDataSource.getAllAlerts()
+
+    suspend fun saveAlert(alert: Alert) = localDataSource.insertAlert(alert)
+
+    suspend fun deleteAlert(alert: Alert) = localDataSource.deleteAlert(alert)
+
 
     // SharedPreferences functions for settings
     fun saveLanguage(language: String) {
@@ -82,5 +101,6 @@ class Repo ( private val remoteSource: WeatherRemoteDataSource , context: Contex
     fun getLocationSource(): String {
         return sharedPreferences.getString("location_source", "GPS") ?: "GPS"
     }
+
 
 }

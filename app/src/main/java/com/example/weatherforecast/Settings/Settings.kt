@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.mvvmproducts.Network.RetrofitHelper
 import com.example.mvvmproducts.Network.WeatherRemoteDataSource
+import com.example.weatherforecast.DB.LocalDataSource
+import com.example.weatherforecast.DB.WeatherDataBase
 import com.example.weatherforecast.Model.LatLong
 import com.example.weatherforecast.Model.Repo
 import com.example.weatherforecast.R
@@ -19,17 +21,22 @@ import org.osmdroid.util.GeoPoint
 
 class Settings : Fragment() {
 
-    private val viewModel: SettingsViewModel by activityViewModels {
-        context?.let {
-            Repo.getInstance(
-                WeatherRemoteDataSource(RetrofitHelper.service), it
-            )
-        }?.let {
-            SettingsViewModelFactory(
-                it
-            )
-        }!!
-    }
+//    val weatherdao = WeatherDataBase.getInstance(requireContext()).getWeatherDAO()
+//    val localDataSource = LocalDataSource(weatherdao )
+//    private val viewModel: SettingsViewModel by activityViewModels {
+//        context?.let {
+//            Repo.getInstance(
+//                WeatherRemoteDataSource(RetrofitHelper.service), it
+//          ,localDataSource  )
+//        }?.let {
+//            SettingsViewModelFactory(
+//                it
+//            )
+//        }!!
+//    }
+
+    private lateinit var localDataSource: LocalDataSource
+    private lateinit var viewModel: SettingsViewModel
 
     private lateinit var radioEnglish: RadioButton
     private lateinit var radioArabic: RadioButton
@@ -42,6 +49,28 @@ class Settings : Fragment() {
 
     private var lastSelectedLocation: String? = null
 
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    // Initialize local data source in onCreate
+    val weatherDao = WeatherDataBase.getInstance(requireContext()).getWeatherDAO()
+    val alertDao = WeatherDataBase.getInstance(requireContext()).getAlertDAO()
+
+    localDataSource = LocalDataSource(weatherDao,alertDao)
+
+    // Initialize ViewModel in onCreate
+    viewModel = activityViewModels<SettingsViewModel> {
+        Repo.getInstance(
+            WeatherRemoteDataSource(RetrofitHelper.service),
+            requireContext(),
+            localDataSource
+        )?.let {
+            SettingsViewModelFactory(
+                it
+            )
+        }!!
+    }.value
+}
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

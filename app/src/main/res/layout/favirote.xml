@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        app:cardBackgroundColor="@color/material_dynamic_neutral_variant95"
+        app:cardBackgroundColor="#00FFFFFF"
         app:cardCornerRadius="20dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,64 +31,53 @@
 
 
             <TextView
-                android:id="@+id/txtCurrentWeatherDate"
-                android:layout_width="189dp"
-                android:layout_height="27dp"
-                android:layout_marginStart="18dp"
-                android:layout_marginTop="16dp"
-                android:gravity="center|center_horizontal|center_vertical"
-                android:text="Monday 23/10/2024 "
-                android:textColor="@color/black"
-                android:textSize="20dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
                 android:id="@+id/txtFavCity"
-                android:layout_width="155dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="16dp"
-                android:gravity="center|center_horizontal|center_vertical"
+                android:layout_width="178dp"
+                android:layout_height="96dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
                 android:text="City "
                 android:textColor="@color/black"
                 android:textSize="20sp"
-                app:layout_constraintStart_toEndOf="@+id/txtCurrentWeatherDate"
-                app:layout_constraintTop_toTopOf="@+id/txtCurrentWeatherDate" />
+                app:layout_constraintStart_toEndOf="@+id/txtTemperature"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/Weather_image"
                 android:layout_width="89dp"
                 android:layout_height="59dp"
-                android:layout_marginStart="21dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
                 android:src="@drawable/cloudy_sunny"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txtCurrentWeatherDate" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/txtWeatherDesc"
-                android:layout_width="148dp"
-                android:layout_height="57dp"
-                android:layout_marginTop="9dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
                 android:gravity="center|center_horizontal|center_vertical"
                 android:text="Mostly Sunny day "
                 android:textColor="@color/black"
-                android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="@+id/txtFavCity"
-                app:layout_constraintTop_toBottomOf="@+id/txtFavCity" />
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="@+id/Weather_image"
+                app:layout_constraintTop_toBottomOf="@+id/Weather_image" />
 
             <TextView
                 android:id="@+id/txtTemperature"
-                android:layout_width="95dp"
-                android:layout_height="67dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginTop="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="48dp"
                 android:gravity="center|center_horizontal|center_vertical"
                 android:text="40°C"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="20dp"
                 app:layout_constraintStart_toEndOf="@+id/Weather_image"
-                app:layout_constraintTop_toBottomOf="@+id/txtCurrentWeatherDate" />
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,8 +14,8 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="#80FFFFFF"
         app:cardCornerRadius="20dp"
+        app:cardBackgroundColor="#00FFFFFF"
         app:cardUseCompatPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +23,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:padding="15dp">
 
             <ImageView
                 android:id="@+id/NextImage"
@@ -42,8 +43,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:gravity="center"
+                android:textColor="@color/black"
                 android:text="Mostly Cloudy"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/NextImage" />
 
@@ -53,10 +54,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="28dp"
+                android:textColor="@color/black"
                 android:gravity="center"
                 android:text="30 °C"
                 android:textSize="24sp"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txtNextHourlyDesc" />
 
@@ -66,9 +67,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                android:textColor="@color/black"
                 android:text="Monday"
                 android:textSize="20sp"
-                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -76,6 +77,7 @@
                 android:id="@+id/txtNextDateDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:layout_marginTop="4dp"
                 android:text="Mon, 23/10/2024"
                 app:layout_constraintStart_toStartOf="@+id/txtNextDay"
